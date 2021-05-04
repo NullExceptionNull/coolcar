@@ -1,0 +1,24 @@
+{
+    "start": "ABC",
+    "end": "EDF",
+    "duration_sec": 1000,
+    "fee_cent": 10,
+    "start_pos": {
+        "latitude": 30,
+        "longitude": 120
+    },
+    "end_pos": {
+        "latitude": 35,
+        "longitude": 115
+    },
+    "path_locations": [
+        {
+            "latitude": 31,
+            "longitude": 119
+        },
+        {
+            "latitude": 32,
+            "longitude": 118
+        }
+    ]
+}
