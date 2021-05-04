@@ -1,5 +1,6 @@
 syntax = "proto3";
 package coolcar;
+import "google/api/annotations.proto";
 
 option go_package = "coolcar/proto/go/go;trippb";
 
@@ -40,5 +41,10 @@ message GetTripRequest{
 }
 
 service TripService{
-  rpc GetTrip (GetTripRequest) returns (GetTripResp);
+  rpc GetTrip (GetTripRequest) returns (GetTripResp){
+    option (google.api.http) = {
+      post: "/v1/trip/get"
+      body: "*"
+    };
+  };
 }
