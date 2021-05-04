@@ -2,21 +2,17 @@ package trip
 
 import (
 	"context"
-
 	trippb "coolcar/proto/gen/go"
 )
 
-// type TripServiceServer interface {
-// 	GetTrip(context.Context, *GetTripRequest) (*GetTripResp, error)
-// }
-
 // Service is a trip service implementation
-type Service struct{}
+type Service struct {
+	trippb.UnimplementedTripServiceServer
+}
 
-func (r *Service) GetTrip(c context.Context, req *trippb.GetTripRequest) (resp *trippb.GetTripResp, e error) {
-
+func (s Service) GetTrip(ctx context.Context, request *trippb.GetTripRequest) (*trippb.GetTripResp, error) {
 	return &trippb.GetTripResp{
-		Id: req.Id,
+		Id: request.Id,
 		Trip: &trippb.Trip{
 			Start:       "ABC",
 			End:         "EDF",
