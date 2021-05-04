@@ -2,7 +2,7 @@ package trip
 
 import (
 	"context"
-	trippb "coolcar/proto/gen/go"
+	trippb "coolcar/proto/trip/gen/go"
 )
 
 // Service is a trip service implementation
@@ -18,6 +18,7 @@ func (s Service) GetTrip(ctx context.Context, request *trippb.GetTripRequest) (*
 			End:         "EDF",
 			DurationSec: 1000,
 			FeeCent:     10,
+			Status:      trippb.TripStatus_IN_PROGRESS,
 			StartPos: &trippb.Location{
 				Latitude:  30,
 				Longitude: 120,

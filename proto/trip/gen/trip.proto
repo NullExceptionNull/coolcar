@@ -23,8 +23,8 @@ enum TripStatus{
 message Trip{
   string start = 1;
   string end = 2;
-  int64 duration_sec = 3;
-  int64 fee_cent = 4;
+  int32 duration_sec = 3;
+  int32 fee_cent = 4;
   Location start_pos = 5;
   Location end_pos = 6;
   repeated Location path_locations = 7;

@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	trippb "coolcar/proto/gen/go"
+	trippb "coolcar/proto/trip/gen/go"
 	"fmt"
 	"log"
 
