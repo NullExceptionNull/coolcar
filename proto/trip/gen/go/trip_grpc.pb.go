@@ -92,7 +92,7 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TripServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetTrip",--
+			MethodName: "GetTrip",
 			Handler:    _TripService_GetTrip_Handler,
 		},
 	},
