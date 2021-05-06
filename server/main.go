@@ -37,10 +37,6 @@ func startGRPCGateway() {
 	c, cancel := context.WithCancel(c)
 	defer cancel()
 
-	marshalOptions := protojson.MarshalOptions{}
-
-	marshalOptions.UseEnumNumbers = true
-
 	mux := runtime.NewServeMux(
 		runtime.WithMarshalerOption(runtime.MIMEWildcard,
 			&runtime.JSONPb{
