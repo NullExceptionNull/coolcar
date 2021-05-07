@@ -22,9 +22,8 @@ import (
 )
 
 const (
-	endpoints  = "localhost:8083"
-	issuer     = "coolcar/auth"
-	privateKey = ``
+	endpoints = "localhost:8083"
+	issuer    = "coolcar/auth"
 )
 
 func main() {
