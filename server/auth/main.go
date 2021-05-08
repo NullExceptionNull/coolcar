@@ -41,7 +41,7 @@ func main() {
 	if err != nil {
 		logger.Fatal("cannot parse private key", zap.Error(err))
 	}
-	server.RunGrpcServer(&server.GrpcServerConfig{
+	_ = server.RunGrpcServer(&server.GrpcServerConfig{
 		Name:   "auth",
 		Addr:   ":8081",
 		Logger: logger,
