@@ -5,18 +5,85 @@ import "google/api/annotations.proto";
 option go_package = "coolcar/rental/api/gen/v1;rentalpb";
 
 
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message LocationStatus {
+  Location Location = 1;
+  int32 fee_cent = 2;
+  double km_driven = 3;
+  string poi_name = 4;
+}
+
+enum TripStatus{
+    TS_NOT_SPECIFICED = 0;
+    IN_PROGRESS = 1;
+    FINISHED = 2;
+}
+
+message TripEntity{
+    string id = 1;
+    Trip trip = 2;
+}
+
+message Trip {
+    string account_id = 1;
+    string car_id = 2;
+    LocationStatus start = 3;
+    LocationStatus current = 4;  
+    LocationStatus end = 5;
+    TripStatus status = 6;
+}
+
 message CreateTripRequest {
-  string start = 1;
+    Location start = 1;
+    string car_id = 2;
+    string poi_name =3;
 }
 
-message CreateTripResponse{
-
+message GetTripRequest{
+  string id = 1;
 }
+
+message GetTripsRequest{
+  TripStatus status = 1;
+}
+
+message GetTripsResponse{
+   repeated Trip trips = 1;
+}
+
+message UpdateTripRequest{
+  string id = 1;
+  Location current = 2;
+  bool end_trip = 3;
+}
+
 
 service TripService{
-  rpc CreateTrip (CreateTripRequest) returns (CreateTripResponse){
+  rpc CreateTrip (CreateTripRequest) returns (TripEntity){
     option (google.api.http) = {
       post: "/v2/trip/create"
+      body: "*"
+    };
+  };
+  rpc GetTrip (GetTripRequest) returns (Trip){
+    option (google.api.http) = {
+      post: "/v2/trip/get"
+      body: "*"
+    };
+  };
+  rpc GetTrips (GetTripsRequest) returns (GetTripsResponse){
+    option (google.api.http) = {
+      post: "/v2/trip/get_trips"
+      body: "*"
+    };
+  };
+  rpc UpdateTrip (UpdateTripRequest) returns (Trip){
+    option (google.api.http) = {
+      post: "/v2/trip/update"
       body: "*"
     };
   };

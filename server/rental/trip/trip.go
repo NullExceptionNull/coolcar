@@ -2,8 +2,7 @@ package trip
 
 import (
 	"context"
-	"coolcar/proto/rental/gen/go"
-	"coolcar/server/shared/auth"
+	rentalpb "coolcar/proto/rental/gen/go"
 	"go.uber.org/zap"
 )
 
@@ -12,14 +11,17 @@ type Service struct {
 	rentalpb.UnimplementedTripServiceServer
 }
 
-func (s *Service) CreateTrip(ctx context.Context, request *rentalpb.CreateTripRequest) (*rentalpb.CreateTripResponse, error) {
+func (s *Service) CreateTrip(context.Context, *rentalpb.CreateTripRequest) (*rentalpb.TripEntity, error) {
+	return nil, nil
+}
+func (s *Service) GetTrip(context.Context, *rentalpb.GetTripRequest) (*rentalpb.Trip, error) {
+	return nil, nil
 
-	aid, err := auth.CidFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+}
+func (s *Service) GetTrips(context.Context, *rentalpb.GetTripsRequest) (*rentalpb.GetTripsResponse, error) {
+	return nil, nil
 
-	s.Logger.Info("Create Trip ", zap.String("Start", aid))
-
-	return &rentalpb.CreateTripResponse{}, nil
+}
+func (s *Service) UpdateTrip(context.Context, *rentalpb.UpdateTripRequest) (*rentalpb.Trip, error) {
+	return nil, nil
 }
