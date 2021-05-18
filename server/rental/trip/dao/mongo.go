@@ -3,9 +3,9 @@ package dao
 import (
 	"context"
 	rentalpb "coolcar/proto/rental/gen/go"
-	mongo2 "coolcar/server/shared/mongo"
+	mgutil "coolcar/server/shared/mongo"
+	"coolcar/server/shared/mongo/objid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -23,11 +23,12 @@ func NewMongo(db *mongo.Database) *Mongo {
 const (
 	tripField      = "trip"
 	accountIDField = tripField + ".accountid"
+	statusField    = tripField + ".status"
 )
 
 type TripRecord struct {
-	mongo2.IDField        `bson:"inline"`
-	mongo2.UpdatedAtField `bson:"inline"`
+	mgutil.IDField        `bson:"inline"`
+	mgutil.UpdatedAtField `bson:"inline"`
 	Trip                  *rentalpb.Trip `bson:"trip"`
 }
 
@@ -35,8 +36,8 @@ func (m *Mongo) CreateTrip(c context.Context, trip *rentalpb.Trip) (*TripRecord,
 	r := &TripRecord{
 		Trip: trip,
 	}
-	r.UpdatedAt = mongo2.UpdatedAt()
-	r.ID = mongo2.NewObjID()
+	r.UpdatedAt = mgutil.UpdatedAt()
+	r.ID = mgutil.NewObjID()
 	_, err := m.col.InsertOne(c, r)
 	if err != nil {
 		return nil, err
@@ -52,7 +53,7 @@ func (m *Mongo) GetTrip(c context.Context, id string, accountID string) (*TripRe
 	}
 
 	result := m.col.FindOne(c, bson.M{
-		mongo2.IDFieldName: objId,
+		mgutil.IDFieldName: objId,
 		accountIDField:     accountID,
 	})
 
@@ -67,4 +68,45 @@ func (m *Mongo) GetTrip(c context.Context, id string, accountID string) (*TripRe
 		return nil, err
 	}
 	return &tr, nil
+}
+
+func (m *Mongo) GetTrips(c context.Context, accountID string, status rentalpb.TripStatus) ([]*TripRecord, error) {
+	filter := bson.M{
+		accountIDField: accountID,
+	}
+	if status != rentalpb.TripStatus_TS_NOT_SPECIFICED {
+		filter[statusField] = status
+	}
+	res, err := m.col.Find(c, filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var trips []*TripRecord
+
+	for res.Next(c) {
+		var trip TripRecord
+		err := res.Decode(&trip)
+		if err != nil {
+			return nil, err
+		}
+		trips = append(trips, &trip)
+	}
+	return trips, nil
+}
+
+func (m *Mongo) UpdateTrip(c context.Context, tripId string, accountId string, updateAt int64, trip *rentalpb.Trip) error {
+
+	tid, _ := objid.FromID(trip)
+
+	_, err := m.col.UpdateOne(c, bson.M{
+		mgutil.IDFieldName:       tid,
+		accountIDField:           accountId,
+		mgutil.UpdateAtFieldName: updateAt,
+	}, mgutil.Set(bson.M{
+		tripField:                trip,
+		mgutil.UpdateAtFieldName: updateAt,
+	}))
+	return err
 }

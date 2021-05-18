@@ -1,4 +1,4 @@
-package mongo
+package mgutil
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
