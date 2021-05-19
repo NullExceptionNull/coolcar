@@ -53,7 +53,7 @@ message GetTripsRequest{
 }
 
 message GetTripsResponse{
-   repeated Trip trips = 1;
+   repeated TripEntity trips = 1;
 }
 
 message UpdateTripRequest{
@@ -68,7 +68,7 @@ service TripService{
     option (google.api.http) = {
       post: "/v2/trip/create"
       body: "*"
-    };
+    }; 
   };
   rpc GetTrip (GetTripRequest) returns (Trip){
     option (google.api.http) = {

@@ -47,10 +47,6 @@ func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest)
 	if err != nil {
 		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
-
-	if err != nil {
-		return nil, err
-	}
 	//检查车辆状态是不是可以出租
 	carId := id.CarID(req.CarId)
 
@@ -92,13 +88,38 @@ func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest)
 		Trip: tr.Trip,
 	}, nil
 }
-func (s *Service) GetTrip(context.Context, *rentalpb.GetTripRequest) (*rentalpb.Trip, error) {
-	return nil, nil
+func (s *Service) GetTrip(c context.Context, req *rentalpb.GetTripRequest) (*rentalpb.Trip, error) {
+
+	aid, err := auth.CidFromContext(c)
+
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "")
+	}
+
+	trip, _ := s.Mongo.GetTrip(c, req.Id, aid)
+
+	return trip.Trip, nil
 
 }
-func (s *Service) GetTrips(context.Context, *rentalpb.GetTripsRequest) (*rentalpb.GetTripsResponse, error) {
-	return nil, nil
+func (s *Service) GetTrips(c context.Context, req *rentalpb.GetTripsRequest) (*rentalpb.GetTripsResponse, error) {
 
+	aid, err := auth.CidFromContext(c)
+
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "")
+	}
+
+	trips, _ := s.Mongo.GetTrips(c, aid, req.Status)
+
+	var res = new(rentalpb.GetTripsResponse)
+
+	for _, tr := range trips {
+		res.Trips = append(res.Trips, &rentalpb.TripEntity{
+			Id:   tr.ID.String(),
+			Trip: tr.Trip,
+		})
+	}
+	return res, nil
 }
 func (s *Service) UpdateTrip(c context.Context, req *rentalpb.UpdateTripRequest) (*rentalpb.Trip, error) {
 
