@@ -6,6 +6,7 @@ import (
 	"coolcar/server/rental/trip/dao"
 	"coolcar/server/shared/auth"
 	"coolcar/server/shared/id"
+	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -40,6 +41,10 @@ func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest)
 
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, err.Error())
+	}
+
+	if req.CarId == "" || req.Start == nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	//验证驾驶者身份
 	identifyId, err := s.ProfileManager.Verify(c, accountID)
@@ -130,9 +135,22 @@ func (s *Service) UpdateTrip(c context.Context, req *rentalpb.UpdateTripRequest)
 	}
 	tr, err := s.Mongo.GetTrip(c, req.Id, aid)
 
-	if req.Current != nil {
-		tr.Trip.Current = s.calcCurrentStatus(tr.Trip, req.GetCurrent())
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "")
 	}
+
+	if tr.Trip.Current == nil {
+		return nil, status.Error(codes.Internal, "")
+	}
+
+	cur := tr.Trip.Current.Location
+
+	if req.Current != nil {
+		cur = req.Current
+	}
+
+	tr.Trip.Current = s.calcCurrentStatus(tr.Trip.Current, cur)
+
 	//如果行程已结束 更新
 	if req.EndTrip {
 		tr.Trip.End = tr.Trip.Current
@@ -144,7 +162,26 @@ func (s *Service) UpdateTrip(c context.Context, req *rentalpb.UpdateTripRequest)
 	return tr.Trip, nil
 }
 
+const (
+	centsPerCents = 0.7
+	KmPerSec      = 0.02
+)
+
+var nowFunc = func() int64 {
+	return time.Now().Unix()
+}
+
 //计算当前的行程状态
-func (s *Service) calcCurrentStatus(trip *rentalpb.Trip, cur *rentalpb.Location) *rentalpb.LocationStatus {
-	return nil
+func (s *Service) calcCurrentStatus(last *rentalpb.LocationStatus, cur *rentalpb.Location) *rentalpb.LocationStatus {
+
+	now := nowFunc()
+
+	f := float64(now - last.TimestampSec)
+
+	return &rentalpb.LocationStatus{
+		Location:     cur,
+		FeeCent:      last.FeeCent + int32(f*centsPerCents),
+		KmDriven:     last.KmDriven + KmPerSec*f,
+		TimestampSec: now,
+	}
 }

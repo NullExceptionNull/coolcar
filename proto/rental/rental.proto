@@ -15,33 +15,34 @@ message LocationStatus {
   int32 fee_cent = 2;
   double km_driven = 3;
   string poi_name = 4;
+  int64  timestamp_sec = 5;
 }
 
 enum TripStatus{
-    TS_NOT_SPECIFICED = 0;
-    IN_PROGRESS = 1;
-    FINISHED = 2;
+  TS_NOT_SPECIFICED = 0;
+  IN_PROGRESS = 1;
+  FINISHED = 2;
 }
 
 message TripEntity{
-    string id = 1;
-    Trip trip = 2;
+  string id = 1;
+  Trip trip = 2;
 }
 
 message Trip {
-    string account_id = 1;
-    string car_id = 2;
-    LocationStatus start = 3;
-    LocationStatus current = 4;  
-    LocationStatus end = 5;
-    TripStatus status = 6;
-    string identity_id = 7;
+  string account_id = 1;
+  string car_id = 2;
+  LocationStatus start = 3;
+  LocationStatus current = 4;
+  LocationStatus end = 5;
+  TripStatus status = 6;
+  string identity_id = 7;
 }
 
 message CreateTripRequest {
-    Location start = 1;
-    string car_id = 2;
-    string poi_name =3;
+  Location start = 1;
+  string car_id = 2;
+  string poi_name = 3;
 }
 
 message GetTripRequest{
@@ -53,7 +54,7 @@ message GetTripsRequest{
 }
 
 message GetTripsResponse{
-   repeated TripEntity trips = 1;
+  repeated TripEntity trips = 1;
 }
 
 message UpdateTripRequest{
@@ -68,7 +69,7 @@ service TripService{
     option (google.api.http) = {
       post: "/v2/trip/create"
       body: "*"
-    }; 
+    };
   };
   rpc GetTrip (GetTripRequest) returns (Trip){
     option (google.api.http) = {
